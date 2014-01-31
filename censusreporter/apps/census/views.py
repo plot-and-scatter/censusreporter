@@ -236,6 +236,12 @@ TOPICS_LIST = [
             ('Sex','http://www.census.gov/acs/www/Downloads/QbyQfact/sex.pdf')
         ]
     },
+    {
+        'title': 'Decoding Table Codes',
+        'slug': 'table-codes',
+        'description': 'Knowing how table codes are structured can speed you up.',
+        'template_name': 'table_codes.html',
+    },
 ]
 
 TOPICS_MAP = { topic['slug']: topic for topic in TOPICS_LIST }

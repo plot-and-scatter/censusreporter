@@ -1,0 +1,38 @@
+{% extends 'topics/_base_topics.html' %}
+
+{% block content %}
+<style>
+    #anatomy span {margin: 0 2px;}
+    .table-type { color: red; }
+    .subject-area { color: blue; }
+    .table-identifier { color: green;}
+    .racial-iteration { color: orange;}
+</style>
+<section id="topic-overview">
+    <h2>Overview</h2>
+    
+    <p>There are nearly 1500 data tables in the American Community Survey. However, there are only a little more than 600 different crosstabulations. Understanding how the table codes are assigned can help you more quickly find what you're looking for.</p>
+
+    <h3>The anatomy of a table code</h3>
+
+    <p id="anatomy">
+        Let's look at a specific table code–table <strong>B01001D</strong>, or <em>Sex by Age (Asian Alone)</em>. This code has four parts:
+       <span class="table-type">B</span><span class="subject-area">01</span><span class="table-identifier">001</span><span class="racial-iteration">D</span>
+    </p>
+
+
+    <ul>
+        <li><strong>A:</strong> White alone</li>
+        <li><strong>B:</strong> Black or African American Alone</li>
+        <li><strong>C:</strong> American Indian and Alaska Native Alone</li>
+        <li><strong>D:</strong> Asian Alone</li>
+        <li><strong>E:</strong> Native Hawaiian and Other Pacific Islander Alone</li>
+        <li><strong>F:</strong> Some Other Race Alone</li>
+        <li><strong>G:</strong> Two or More Races</li>
+        <li><strong>H:</strong> White Alone, Not Hispanic or Latino</li>
+        <li><strong>I:</strong> Hispanic or Latino</li>
+    </u>
+</section>
+{% endblock %}
+
+
