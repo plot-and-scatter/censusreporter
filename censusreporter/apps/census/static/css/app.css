@@ -856,14 +856,14 @@ h1.article-header-right {
     font-weight: bold;
 }
 .grid .value {
-    width: 7em;
+    min-width: 7em;
     text-align: right;
     padding-right: 1em;
 }
 .grid .context {
     font-size: .9em;
     margin-bottom: -.1em;
-    width: 4em;
+    min-width: 4em;
 }
 .stat .context {
     margin-left: .33em;
@@ -1651,7 +1651,7 @@ section.chart-divider h2 {
     bottom: -6px;
     margin-left: -5px;
 }
-.coal-chart li a {
+.coal-chart li .point {
     display: block;
     cursor: pointer;
     position: relative;
@@ -1664,21 +1664,21 @@ section.chart-divider h2 {
     -moz-border-radius: 50%;
     border-radius: 50%;
 }
-.coal-chart li a:hover,
-.coal-chart li a.hovered {
+.coal-chart li .point:hover,
+.coal-chart li .point.hovered {
     background-color: #42472e;
     border-color: #42472e;
     z-index: 3;
 }
-.coal-chart li a.selected {
+.coal-chart li .point.selected {
     background-color: #027b7a;
     border-color: #027b7a;
     z-index: 2;
 }
-.coal-chart li a.selected.hovered {
+.coal-chart li .point.selected.hovered {
     z-index: 4;
 }
-.coal-chart li a .hovercard {
+.coal-chart li .point .hovercard {
     position: absolute;
     width: 15em;
     bottom: 1.5em;
@@ -1689,10 +1689,11 @@ section.chart-divider h2 {
     display: none;
     padding: .5em;
     border: 1px solid #e0e0e0;
+    pointer-events: auto;
 }
-.coal-chart li a:hover .hovercard,
-.coal-chart li a.hovered .hovercard,
-.coal-chart li a.selected .hovercard {
+.coal-chart li .point:hover .hovercard,
+.coal-chart li .point.hovered .hovercard,
+.coal-chart li .point.selected .hovercard {
     display: block;
     background-color: #fff;
 }
@@ -2341,6 +2342,7 @@ aside .search .result-type {
     margin: 65px 20px;
     height: 20px;
     width: 20px;
+    z-index: 100;
 }
 
 .message {
