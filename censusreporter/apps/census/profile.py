@@ -180,49 +180,10 @@ def add_metadata(dictionary, table_id, universe, acs_release):
 
     dictionary['metadata'] = val
 
-def geo_profile(geoid, acs='latest'):
-    api = ApiClient(settings.API_URL)
-
-    item_levels = api.get_parent_geoids(geoid)['parents']
-    comparison_geoids = [level['geoid'] for level in item_levels]
-    comparison_geoids.append(geoid)
-
-    doc = OrderedDict([('geography', OrderedDict()),
-                       ('demographics', dict()),
-                       ('economics', dict()),
-                       ('families', dict()),
-                       ('housing', dict()),
-                       ('social', dict())])
-
-    data = api.get_data('B01001', comparison_geoids, acs)
+def _assemble_demographics_age_dict(data, item_levels):
     acs_name = data['release']['name']
-    doc['geography']['census_release'] = acs_name
 
-    def convert_geography_data(row):
-        return dict(full_name=row['display_name'],
-                    short_name=row['simple_name'],
-                    sumlevel=row['sumlevel'],
-                    land_area=row['aland'],
-                    full_geoid=row['full_geoid'])
-
-    doc['geography']['parents'] = OrderedDict()
-
-    for item_level in item_levels:
-        name = item_level['relation']
-        the_geoid = item_level['geoid']
-        geoid_data = api.get_geoid_data(the_geoid)['properties']
-
-        if name == 'this':
-            doc['geography'][name] = convert_geography_data(geoid_data)
-            doc['geography'][name]['total_population'] = _maybe_int(data['data'][the_geoid]['B01001']['estimate']['B01001001'])
-        else:
-            doc['geography']['parents'][name] = convert_geography_data(geoid_data)
-            doc['geography']['parents'][name]['total_population'] = _maybe_int(data['data'][the_geoid]['B01001']['estimate']['B01001001'])
-
-    # Demographics: Age
     age_dict = dict()
-    doc['demographics']['age'] = age_dict
-
     cat_dict = OrderedDict()
     age_dict['distribution_by_category'] = cat_dict
     add_metadata(age_dict['distribution_by_category'], 'B01001', 'Total population', acs_name)
@@ -309,20 +270,25 @@ def geo_profile(geoid, acs='latest'):
     population_by_age_total['80+'] = build_item('80+', data, item_levels,
         'B01001024 B01001025 + B01001048 + B01001049 + B01001001 / %')
 
+    return age_dict
+
+
+def _assemble_demographics_sex_dict(data, item_levels):
     # Demographics: Sex
+    acs_name = data['release']['name']
     sex_dict = OrderedDict()
-    doc['demographics']['sex'] = sex_dict
+
     add_metadata(sex_dict, 'B01001', 'Total population', acs_name)
     sex_dict['percent_male'] = build_item('Male', data, item_levels,
         'B01001002 B01001001 / %')
     sex_dict['percent_female'] = build_item('Female', data, item_levels,
         'B01001026 B01001001 / %')
 
-    data = api.get_data('B01002', comparison_geoids, acs)
-    acs_name = data['release']['name']
+    return sex_dict
 
+def _assemble_demographics_median_age_dict(data, item_levels):
+    acs_name = data['release']['name']
     median_age_dict = dict()
-    age_dict['median_age'] = median_age_dict
     median_age_dict['total'] = build_item('Median age', data, item_levels,
         'B01002001')
     add_metadata(median_age_dict['total'], 'B01002', 'Total population', acs_name)
@@ -333,12 +299,11 @@ def geo_profile(geoid, acs='latest'):
         'B01002003')
     add_metadata(median_age_dict['female'], 'B01002', 'Total population', acs_name)
 
-    # Demographics: Race
-    data = api.get_data('B03002', comparison_geoids, acs)
-    acs_name = data['release']['name']
+    return median_age_dict
 
+def _assemble_demographics_race_dict(data, item_levels):
+    acs_name = data['release']['name']
     race_dict = OrderedDict()
-    doc['demographics']['race'] = race_dict
     add_metadata(race_dict, 'B03002', 'Total population', acs_name)
 
     race_dict['percent_white'] = build_item('White', data, item_levels,
@@ -368,6 +333,59 @@ def geo_profile(geoid, acs='latest'):
 
     race_dict['percent_hispanic'] = build_item('Hispanic', data, item_levels,
         'B03002012 B03002001 / %')
+
+    return race_dict
+def geo_profile(geoid, acs='latest'):
+    api = ApiClient(settings.API_URL)
+
+    item_levels = api.get_parent_geoids(geoid)['parents']
+    comparison_geoids = [level['geoid'] for level in item_levels]
+    comparison_geoids.append(geoid)
+
+    doc = OrderedDict([('geography', OrderedDict()),
+                       ('demographics', dict()),
+                       ('economics', dict()),
+                       ('families', dict()),
+                       ('housing', dict()),
+                       ('social', dict())])
+
+    data = api.get_data('B01001', comparison_geoids, acs)
+
+    populated = data['data'][geoid]['B01001']['estimate']['B01001001'] > 0
+
+    doc['geography']['census_release'] = data['release']['name']
+
+    def convert_geography_data(row):
+        return dict(full_name=row['display_name'],
+                    short_name=row['simple_name'],
+                    sumlevel=row['sumlevel'],
+                    land_area=row['aland'],
+                    full_geoid=row['full_geoid'])
+
+    doc['geography']['parents'] = OrderedDict()
+
+    for item_level in item_levels:
+        name = item_level['relation']
+        the_geoid = item_level['geoid']
+        geoid_data = api.get_geoid_data(the_geoid)['properties']
+
+        if name == 'this':
+            doc['geography'][name] = convert_geography_data(geoid_data)
+            doc['geography'][name]['total_population'] = _maybe_int(data['data'][the_geoid]['B01001']['estimate']['B01001001'])
+        else:
+            doc['geography']['parents'][name] = convert_geography_data(geoid_data)
+            doc['geography']['parents'][name]['total_population'] = _maybe_int(data['data'][the_geoid]['B01001']['estimate']['B01001001'])
+
+    # if populated:
+    doc['demographics']['age'] = _assemble_demographics_age_dict(data, item_levels)
+    doc['demographics']['sex'] = _assemble_demographics_sex_dict(data, item_levels)
+
+    data = api.get_data('B01002', comparison_geoids, acs)
+    doc['demographics']['age']['median_age'] = _assemble_demographics_median_age_dict(data, item_levels)
+
+    # Demographics: Race
+    data = api.get_data('B03002', comparison_geoids, acs)
+    doc['demographics']['race'] = _assemble_demographics_race_dict(data, item_levels)
 
     # Economics: Per-Capita Income
     data = api.get_data('B19301', comparison_geoids, acs)
