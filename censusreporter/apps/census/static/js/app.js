@@ -51,6 +51,8 @@ var sumlevMap = {
             "children": ['060','140','150','160','500','610','620','860','950','960','970']},
     "060": {"name": "county subdivision", "plural": "county subdivisions", "sumlev": "060", "size_sort": 750,
             "children": ['140','150','160','250','310','500','610','620','860','950','960','970']},
+    "067": {"name": "subbarrio", "plural": "subbarrios", "sumlev": "067", "size_sort": 600,
+            "children": ['140','150','160','250','310','500','610','620','860','950','960','970']},
     "140": {"name": "census tract", "plural": "census tracts", "sumlev": "140", "size_sort": 100,
             "children": ['150']},
     "150": {"name": "block group", "plural": "block groups", "sumlev": "150", "size_sort": 50,
@@ -213,7 +215,7 @@ var roundNumber = function(value, decimals) {
     var precision = (!!decimals) ? decimals : 0,
         factor = Math.pow(10, precision),
         value = Math.round(value * factor) / factor;
-    
+
     return value;
 }
 

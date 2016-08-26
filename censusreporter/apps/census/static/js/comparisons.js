@@ -37,7 +37,7 @@ function Comparison(options, callback) {
         comparison.dataFormat = options.dataFormat;
         comparison.geoIDs = options.geoIDs;
         comparison.primaryGeoID = options.primaryGeoID || ((comparison.geoIDs.length == 1) ? comparison.geoIDs[0] : null);
-        comparison.chosenSumlevAncestorList = '010,020,030,040,050,060,160,250,252,254,310,500,610,620,860,950,960,970';
+        comparison.chosenSumlevAncestorList = '010,020,030,040,050,060,067,160,250,252,254,310,500,610,620,860,950,960,970';
         // jQuery things
         comparison.$topicSelect = $(options.topicSelect);
         comparison.$topicSelectContainer = $(options.topicSelectContainer);
@@ -1096,6 +1096,8 @@ function Comparison(options, callback) {
             {name: 'state', plural_name: 'states', sumlev: '040', ancestor_sumlev_list: '010,020,030', ancestor_options: 'the United States, a region or division' },
             {name: 'county', plural_name: 'counties', sumlev: '050', ancestor_sumlev_list: '010,020,030,040', ancestor_options: 'the United States, a region, division or state' },
             {name: 'county subdivision', plural_name: 'county subdivisions', sumlev: '060', ancestor_sumlev_list: '010,020,030,040,050', ancestor_options: 'the United States, a region, division, state or county' },
+            // TODO figure out the right ancestor list for subbarrios -- probably not 020 and 030.
+            {name: 'subbarrio', plural_name: 'subbarrios', sumlev: '067', ancestor_sumlev_list: '010,020,030,040,050,060', ancestor_options: 'the United States, a region, division, state or county' },
             {name: 'place', plural_name: 'places', sumlev: '160', ancestor_sumlev_list: '010,020,030,040,050', ancestor_options: 'the United States, a region, division, state or county' },
             {name: 'metro area', plural_name: 'metro areas', sumlev: '310', ancestor_sumlev_list: '010,020,030,040', ancestor_options: 'the United States, a region, division or state' },
             {name: 'native area', plural_name: 'native areas', sumlev: '250', ancestor_sumlev_list: '010,020,030,040', ancestor_options: 'the United States, a region, division or state' },
