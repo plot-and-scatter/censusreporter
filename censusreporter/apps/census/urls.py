@@ -65,7 +65,7 @@ urlpatterns = patterns('',
     ),
 
     url(
-        regex   = '^tables/(?P<table>[a-zA-Z0-9]+)/$',
+        regex   = '^tables/(?P<table>[a-zA-Z0-9\-]+)/$',
         view    = cache_page(STANDARD_CACHE_TIME)(TableDetailView.as_view()),
         kwargs  = {},
         name    = 'table_detail',
