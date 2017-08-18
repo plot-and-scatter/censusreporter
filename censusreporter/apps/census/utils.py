@@ -21,19 +21,31 @@ class LazyEncoder(simplejson.JSONEncoder):
 
 def parse_table_id(table_id):
     table_id = table_id.upper()
-    pat = re.compile(r'^(B|C)(\d+)([A-I])?(PR)?')
-    table_type, tabulation, race_iter, pr = pat.match(table_id).groups()
+    print('parse_table_id', table_id)
+    # pat = re.compile(r'^(B|C)(\d+)([A-I])?(PR)?')
+    # table_type, tabulation, race_iter, pr = pat.match(table_id).groups()
 
+    # return {
+    #     'table_id': table_id,
+    #     'table_type': table_type,
+    #     'detailed': table_type == 'B',
+    #     'simplified': table_type == 'C',
+    #     'tabulation': tabulation,
+    #     'racial': race_iter is not None,
+    #     'race_code': race_iter,
+    #     'race': RACE_ITERATIONS.get(race_iter),
+    #     'puerto_rico': pr is not None,
+    # }
     return {
         'table_id': table_id,
-        'table_type': table_type,
-        'detailed': table_type == 'B',
-        'simplified': table_type == 'C',
-        'tabulation': tabulation,
-        'racial': race_iter is not None,
-        'race_code': race_iter,
-        'race': RACE_ITERATIONS.get(race_iter),
-        'puerto_rico': pr is not None,
+        'table_type': 'X',
+        'detailed': True,
+        'simplified': False,
+        'tabulation': '003',
+        'racial': False,
+        'race_code': None,
+        'race': [],
+        'puerto_rico': False,
     }
 
 def generic_table_description(table_id):

@@ -93,23 +93,40 @@ class TableDetailView(TemplateView):
     TABLE_TYPE_TRANSLATE_DICT = {
         'B': 'Detailed',
         'C': 'Collapsed',
+        'X': 'Detailed'
     }
 
     def dispatch(self, *args, **kwargs):
+
+        print('TableDetailView')
+
         table_argument = self.kwargs.get('table', None)
+
+        print('table_argument', table_argument)
+
         # canonicalize
         if table_argument and not table_argument == table_argument.upper():
             return HttpResponseRedirect(
                         reverse('table_detail', args=(table_argument.upper(),))
                     )
 
-        self.table_code = table_argument
-        self.table_group = self.table_code[0]
-        self.tabulation_code = re.sub("\D", "", self.table_code)
+        #self.table_code = table_argument
+        self.table_code = table_argument[-3:]
+
+        # The last three digits will be the table number
+        #self.table_group = self.table_code[0]
+        self.table_group = self.table_code
+        #self.tabulation_code = re.sub("\D", "", self.table_code)
+        self.tabulation_code = self.table_group
+
+        print(self.table_code, self.table_group, self.tabulation_code)
+
 
         try:
+            print('in here')
             return super(TableDetailView, self).dispatch(*args, **kwargs)
         except Http404, e:
+            print('out here')
             # Check if core table doesn't exist, but has iterations; if so,
             # redirect to the first iteration.
             if table_argument.endswith('PR'):
@@ -125,9 +142,17 @@ class TableDetailView(TemplateView):
             raise e
 
     def get_tabulation_data(self, table_code):
+
+        print('get_tabulation_data')
+
         endpoint = settings.API_URL + '/1.0/tabulation/%s' % table_code
+
+        print('--> endpoint', endpoint)
+
         r = r_session.get(endpoint)
         status_code = r.status_code
+
+        print('r', r)
 
         # make sure we've requested a legit tabulation code
         if status_code == 200:
@@ -207,8 +232,10 @@ class TableDetailView(TemplateView):
         for group, group_values in tables.iteritems():
             preview_table = next(group_values.iteritems())[0]
             try:
+                print('>>>', preview_table.upper())
                 tabulation_data['related_tables']['preview'][preview_table] = self.get_table_data(preview_table)
-                tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT[preview_table.upper()[0]]
+                # tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT[preview_table.upper()[0]]
+                tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT['X']
             except ValueError:
                 continue
 
@@ -225,7 +252,12 @@ class TableDetailView(TemplateView):
         return related_topic_pages
 
     def get_table_data(self, table_code):
+        print('get_table_data')
+
         endpoint = settings.API_URL + '/2.0/table/latest/%s' % table_code
+
+        print('--> endpoint', endpoint)
+
         r = r_session.get(endpoint)
 
         if r.status_code == 200:
@@ -236,6 +268,8 @@ class TableDetailView(TemplateView):
             raise Http404
 
     def get_context_data(self, *args, **kwargs):
+        print('get_context_data')
+
         page_context = {
             'table': self.get_table_data(self.table_code),
             'tabulation': self.get_tabulation_data(self.tabulation_code),
@@ -271,6 +305,8 @@ class GeographyDetailView(TemplateView):
         return (geoid,slug)
 
     def dispatch(self, *args, **kwargs):
+
+        print('GeographyDetailView')
 
         self.geo_id, self.slug = self.parse_fragment(kwargs.get('fragment'))
 
@@ -438,6 +474,9 @@ class DataView(TemplateView):
     template_name = 'data/data_table.html'
 
     def dispatch(self, *args, **kwargs):
+
+        print('DataView')
+
         self.table = self.request.GET.get('table', None)
         self.primary_geo_id = self.request.GET.get('primary_geo_id', None)
         self.geo_ids = self.request.GET.get('geo_ids', '01000US')
